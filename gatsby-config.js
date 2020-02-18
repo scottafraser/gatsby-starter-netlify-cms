@@ -6,6 +6,7 @@ module.exports = {
   },
   plugins: [
     "gatsby-plugin-react-helmet",
+    `gatsby-plugin-portal`,
     "gatsby-plugin-sass",
     {
       // keep as first gatsby-source-filesystem plugin for gatsby image support
@@ -65,6 +66,12 @@ module.exports = {
         modulePath: `${__dirname}/src/cms/cms.js`
       }
     },
+    {
+        resolve: `gatsby-plugin-netlify-identity`,
+        options: {
+          url: `https://musing-brown-de9ad8.netlify.com/` // required!
+      }
+    }, 
     {
       resolve: "gatsby-plugin-purgecss", // purges all unused/unreferenced css rules
       options: {

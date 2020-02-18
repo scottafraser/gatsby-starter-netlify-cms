@@ -3,13 +3,26 @@ import { Helmet } from 'react-helmet'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 import './all.sass'
+import './styles.css'
 import useSiteMetadata from './SiteMetadata'
 import { withPrefix } from 'gatsby'
+import IdentityModal, { useIdentityContext } from "react-netlify-identity-widget"
+import "react-netlify-identity-widget/styles.css" 
+import { logout } from '../services/auth'
 
 const TemplateWrapper = ({ children }) => {
   const { title, description } = useSiteMetadata()
+  const identity = useIdentityContext()
+  const [dialog, setDialog] = React.useState(false)
+  const name =
+    (identity && identity.user && identity.user.user_metadata && identity.user.user_metadata.name) || "NoName"
+    console.log(JSON.stringify(identity))
+    const isLoggedIn = identity && identity.isLoggedIn
+
   return (
     <div>
+      {isLoggedIn ?  
+      <>
       <Helmet>
         <html lang="en" />
         <title>{title}</title>
@@ -48,9 +61,22 @@ const TemplateWrapper = ({ children }) => {
           content={`${withPrefix('/')}img/og-image.jpg`}
         />
       </Helmet>
+      <button className="btn" onClick={() => setDialog(true)}>
+        {isLoggedIn ? `Hello ${name}, Log out here!` : "LOG IN"}
+        </button>
+      <IdentityModal showDialog={dialog} onCloseDialog={() => setDialog(false)} onLogout={() => console.log('bye ', name)}/>
       <Navbar />
       <div>{children}</div>
-      <Footer />
+      <Footer /> 
+      </>
+      : 
+      <div id="gateway">
+        <button className="btn" onClick={() => setDialog(true)}>
+        {isLoggedIn ? `Hello ${name}, Log out here!` : "LOG IN"}
+        </button>
+        <IdentityModal showDialog={dialog} onCloseDialog={() => setDialog(false)} onLogout={() => console.log('bye ', name)}/>
+      </div>
+      }
     </div>
   )
 }
