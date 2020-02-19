@@ -1,4 +1,4 @@
-import React from 'react'
+import React , { useState }  from 'react'
 import { Helmet } from 'react-helmet'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
@@ -8,20 +8,26 @@ import useSiteMetadata from './SiteMetadata'
 import { withPrefix } from 'gatsby'
 import IdentityModal, { useIdentityContext } from "react-netlify-identity-widget"
 import "react-netlify-identity-widget/styles.css" 
-import { logout } from '../services/auth'
+import AgeGate from './AgeGate'
 
 const TemplateWrapper = ({ children }) => {
   const { title, description } = useSiteMetadata()
   const identity = useIdentityContext()
-  const [dialog, setDialog] = React.useState(false)
+  const [dialog, setDialog ] = useState(false)
+  const [age, setAge] = useState(false)
   const name =
     (identity && identity.user && identity.user.user_metadata && identity.user.user_metadata.name) || "NoName"
-    console.log(JSON.stringify(identity))
+    // console.log(JSON.stringify(identity))
     const isLoggedIn = identity && identity.isLoggedIn
+    function isOfAge() {
+      setAge(true)
+    }
 
   return (
     <div>
       {isLoggedIn ?  
+      <>
+      {age ? 
       <>
       <Helmet>
         <html lang="en" />
@@ -69,6 +75,10 @@ const TemplateWrapper = ({ children }) => {
       <div>{children}</div>
       <Footer /> 
       </>
+      :
+      <AgeGate setAge={isOfAge}/>
+      }
+      </>
       : 
       <div id="gateway">
         <button className="btn" onClick={() => setDialog(true)}>
@@ -76,7 +86,7 @@ const TemplateWrapper = ({ children }) => {
         </button>
         <IdentityModal showDialog={dialog} onCloseDialog={() => setDialog(false)} onLogout={() => console.log('bye ', name)}/>
       </div>
-      }
+    }
     </div>
   )
 }
